@@ -1,8 +1,8 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "2.1.20"
-    id("org.jetbrains.intellij.platform") version "2.10.2"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.intellijPlatform)
+    alias(libs.plugins.kotlinCompose)
 }
 
 group = "io.github.aiideplugins.extendedmcp"
