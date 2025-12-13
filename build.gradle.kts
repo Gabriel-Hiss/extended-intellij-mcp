@@ -23,6 +23,7 @@ dependencies {
 
         // Add plugin dependencies for compilation here:
 
+        @Suppress("UnstableApiUsage")
         composeUI()
 
     }
