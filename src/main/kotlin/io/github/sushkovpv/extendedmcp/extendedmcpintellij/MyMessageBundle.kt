@@ -1,4 +1,4 @@
-package io.github.aiideplugins.extendedmcp.extendedmcpintellij
+package io.github.sushkovpv.extendedmcp.extendedmcpintellij
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.Nls

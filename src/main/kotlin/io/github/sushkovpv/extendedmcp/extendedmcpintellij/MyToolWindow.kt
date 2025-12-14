@@ -1,4 +1,4 @@
-package io.github.aiideplugins.extendedmcp.extendedmcpintellij
+package io.github.sushkovpv.extendedmcp.extendedmcpintellij
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
