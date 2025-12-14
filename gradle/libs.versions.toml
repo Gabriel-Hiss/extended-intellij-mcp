@@ -1,6 +1,6 @@
 [versions]
-kotlin = "2.1.20"
-intellijPlatform = "2.10.2"
+kotlin = "2.3.0-RC2"
+intellijPlatform = "2.10.5"
 
 [plugins]
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
