@@ -23,6 +23,8 @@ dependencies {
 
         // Add plugin dependencies for compilation here:
 
+        bundledPlugins("com.intellij.mcpServer")
+
         @Suppress("UnstableApiUsage")
         composeUI()
 
@@ -32,7 +34,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "253.28294.334"
+//            sinceBuild = "253.28294.334"
         }
 
         changeNotes = """

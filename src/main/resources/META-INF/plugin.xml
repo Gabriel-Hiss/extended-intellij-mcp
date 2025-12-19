@@ -20,6 +20,8 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.compose</depends>
+    <!-- Consume MCP Server plugin to extend its toolsets -->
+    <depends>com.intellij.mcpServer</depends>
 
     <resource-bundle>messages.MyMessageBundle</resource-bundle>
     <!-- Extensions defined by the plugin.
@@ -27,5 +29,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="MyToolWindow" factoryClass="io.github.sushkovpv.extendedmcp.extendedmcpintellij.MyToolWindowFactory"
                     icon="AllIcons.Toolwindows.ToolWindowPalette"/>
+        <mcpServer.mcpToolset implementation="io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset"/>
     </extensions>
 </idea-plugin>
