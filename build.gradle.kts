@@ -1,6 +1,7 @@
 plugins {
     id("java")
     alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.intellijPlatform)
     alias(libs.plugins.kotlinCompose)
 }
