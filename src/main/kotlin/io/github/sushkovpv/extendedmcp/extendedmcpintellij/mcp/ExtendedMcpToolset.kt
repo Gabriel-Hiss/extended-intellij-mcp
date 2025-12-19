@@ -28,6 +28,7 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Simple demo toolset that proves plugin can extend MCP server.
@@ -89,7 +90,7 @@ class ExtendedMcpToolset : McpToolset {
 
         val usages = CopyOnWriteArrayList<UsageInfo>()
 
-        val timedOut = withTimeoutOrNull(timeout.toLong()) {
+        val timedOut = withTimeoutOrNull(timeout.milliseconds) {
             val processor = Processor<UsageInfo> { usageInfo ->
                 usages.add(usageInfo)
                 usages.size < maxUsageCount
