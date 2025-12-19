@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName", "unused")
+
 package io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp
 
 import com.intellij.find.FindManager
@@ -9,8 +11,6 @@ import com.intellij.mcpserver.mcpFail
 import com.intellij.mcpserver.project
 import com.intellij.mcpserver.toolsets.Constants
 import com.intellij.mcpserver.toolsets.Constants.MAX_USAGE_TEXT_CHARS
-import com.intellij.mcpserver.util.projectDirectory
-import com.intellij.mcpserver.util.relativizeIfPossible
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.coroutineToIndicator
@@ -35,19 +35,14 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 class ExtendedMcpToolset : McpToolset {
     @McpTool
-    suspend fun helloFromExtendedMcp(name: String = "world"): String {
-        val project = currentCoroutineContext().project
-
-        return "Hello, $name! (from Extended MCP plugin)"
-    }
-
-    @McpTool
-    @McpDescription("""
+    @McpDescription(
+        """
         |Searches with a regex pattern within project dependencies (libraries) using IntelliJ's search engine.
         |Prefer this tool over reading files with command-line tools because it's much faster.
         |
         |The result occurrences are surrounded with || characters, e.g. `some text ||substring|| text`
-    """)
+    """
+    )
     suspend fun search_in_dependencies_by_regex(
         @McpDescription("Regex pattern to search for")
         regexPattern: String,
@@ -72,8 +67,6 @@ class ExtendedMcpToolset : McpToolset {
         maxUsageCount: Int = 1000,
         timeout: Int = Constants.MEDIUM_TIMEOUT_MILLISECONDS_VALUE,
     ): UsageInfoResult {
-        val projectDir = project.projectDirectory
-
         if (regexPattern.isBlank()) mcpFail("Search text is empty")
 
         val findModel = FindManager.getInstance(project).findInProjectModel.clone().apply {
