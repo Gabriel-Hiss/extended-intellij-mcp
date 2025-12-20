@@ -43,7 +43,7 @@ private fun MyToolWindowContent(project: Project) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         DependencyRegexSearchTool(project)
-        DependencyFileViewTool(project)
+        DependencyFileViewTool()
         SyncProjectTool(project)
     }
 }
@@ -91,7 +91,7 @@ private fun SyncProjectTool(project: Project) {
 }
 
 @Composable
-private fun DependencyFileViewTool(project: Project) {
+private fun DependencyFileViewTool() {
     val urlState = rememberTextFieldState()
     val lineNumberState = rememberTextFieldState("1")
     val linesBeforeState = rememberTextFieldState("300")
