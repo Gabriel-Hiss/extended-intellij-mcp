@@ -27,7 +27,7 @@
     <!-- Extensions defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="MyToolWindow" factoryClass="io.github.sushkovpv.extendedmcp.extendedmcpintellij.MyToolWindowFactory"
+        <toolWindow id="ExtendedMCP" anchor="right" factoryClass="io.github.sushkovpv.extendedmcp.extendedmcpintellij.ExtendedMcpToolWindowFactory"
                     icon="AllIcons.Toolwindows.ToolWindowPalette"/>
         <mcpServer.mcpToolset implementation="io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset"/>
     </extensions>

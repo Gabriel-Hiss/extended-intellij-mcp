@@ -22,20 +22,20 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.jewel.bridge.addComposeTab
 import org.jetbrains.jewel.ui.component.*
 
-private val logger = logger<MyToolWindowFactory>()
+private val logger = logger<ExtendedMcpToolWindowFactory>()
 
-class MyToolWindowFactory : ToolWindowFactory {
+class ExtendedMcpToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = ApplicationManager.getApplication().isInternal
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        toolWindow.addComposeTab("My Tool Window", focusOnClickInside = true) {
-            MyToolWindowContent(project)
+        toolWindow.addComposeTab("Extended MCP", focusOnClickInside = true) {
+            ExtendedMcpToolWindowContent(project)
         }
     }
 }
 
 @Composable
-private fun MyToolWindowContent(project: Project) {
+private fun ExtendedMcpToolWindowContent(project: Project) {
     Column(
         Modifier
             .padding(20.dp)
