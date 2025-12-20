@@ -9,8 +9,6 @@ import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
 import com.intellij.mcpserver.mcpFail
 import com.intellij.mcpserver.project
-import com.intellij.mcpserver.toolsets.Constants
-import com.intellij.mcpserver.toolsets.Constants.MAX_USAGE_TEXT_CHARS
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.coroutineToIndicator
@@ -22,6 +20,7 @@ import com.intellij.usageView.UsageInfo
 import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
+import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.Constants.MAX_USAGE_TEXT_CHARS
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.EncodeDefault
@@ -51,7 +50,7 @@ class ExtendedMcpToolset : McpToolset {
         @McpDescription("Whether to search for the text in a case-sensitive manner")
         caseSensitive: Boolean = true,
         @McpDescription("Maximum number of entries to return.")
-        maxUsageCount: Int = 1000,
+        maxUsageCount: Int = 100,
         @McpDescription(Constants.TIMEOUT_MILLISECONDS_DESCRIPTION)
         timeout: Int = Constants.MEDIUM_TIMEOUT_MILLISECONDS_VALUE,
     ): UsageInfoResult {
@@ -64,7 +63,7 @@ class ExtendedMcpToolset : McpToolset {
         regexPattern: String,
         fileMask: String? = null,
         caseSensitive: Boolean = true,
-        maxUsageCount: Int = 1000,
+        maxUsageCount: Int = 100,
         timeout: Int = Constants.MEDIUM_TIMEOUT_MILLISECONDS_VALUE,
     ): UsageInfoResult {
         if (regexPattern.isBlank()) mcpFail("Search text is empty")
