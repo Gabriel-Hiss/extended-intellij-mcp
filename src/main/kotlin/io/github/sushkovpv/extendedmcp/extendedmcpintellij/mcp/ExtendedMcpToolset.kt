@@ -9,6 +9,10 @@ import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
 import com.intellij.mcpserver.mcpFail
 import com.intellij.mcpserver.project
+import com.intellij.openapi.externalSystem.ExternalSystemManager
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.coroutineToIndicator
@@ -22,7 +26,9 @@ import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
 import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.Constants.MAX_USAGE_TEXT_CHARS
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -155,6 +161,23 @@ class ExtendedMcpToolset : McpToolset {
             val endOffset = document.getLineEndOffset(endLine)
 
             document.getText(TextRange(startOffset, endOffset))
+        }
+    }
+
+    @McpTool
+    @McpDescription("Synchronizes all external systems (Gradle, Maven, NPM, etc.) for the project to apply changes in dependencies.")
+    suspend fun sync_project() {
+        val project = currentCoroutineContext().project
+        syncProject(project)
+    }
+
+    suspend fun syncProject(project: Project) {
+        withContext(Dispatchers.EDT) {
+            FileDocumentManager.getInstance().saveAllDocuments()
+
+            ExternalSystemManager.EP_NAME.forEachExtensionSafe { manager ->
+                ExternalSystemUtil.refreshProjects(ImportSpecBuilder(project, manager.systemId))
+            }
         }
     }
 

@@ -1,16 +1,16 @@
 package io.github.sushkovpv.extendedmcp.extendedmcpintellij
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -22,22 +22,19 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.jewel.bridge.addComposeTab
 import org.jetbrains.jewel.ui.component.*
 
+private val logger = logger<MyToolWindowFactory>()
+
 class MyToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = ApplicationManager.getApplication().isInternal
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.addComposeTab("My Tool Window", focusOnClickInside = true) {
-            LaunchedEffect(Unit) {
-                // initial data loading
-            }
-
             MyToolWindowContent(project)
         }
     }
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun MyToolWindowContent(project: Project) {
     Column(
         Modifier
@@ -47,11 +44,53 @@ private fun MyToolWindowContent(project: Project) {
     ) {
         DependencyRegexSearchTool(project)
         DependencyFileViewTool(project)
+        SyncProjectTool(project)
     }
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
+private fun SyncProjectTool(project: Project) {
+    var statusText by remember { mutableStateOf("") }
+    var isRunning by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val toolset = remember { ExtendedMcpToolset() }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("sync_project", fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                enabled = !isRunning,
+                onClick = {
+                    isRunning = true
+                    statusText = "Syncing..."
+                    scope.launch {
+                        val result = runCatching {
+                            toolset.syncProject(project)
+                        }
+                        result.onSuccess {
+                            statusText = "Done"
+                        }.onFailure { error ->
+                            statusText = "Failed: ${error.message}"
+                            logger.error(error)
+                        }
+                        isRunning = false
+                    }
+                },
+            ) { Text("Sync Project") }
+            OutlinedButton(
+                enabled = !isRunning,
+                onClick = {
+                    statusText = ""
+                },
+            ) { Text("Clear") }
+        }
+        if (statusText.isNotBlank()) {
+            Text(statusText)
+        }
+    }
+}
+
+@Composable
 private fun DependencyFileViewTool(project: Project) {
     val urlState = rememberTextFieldState()
     val lineNumberState = rememberTextFieldState("1")
@@ -61,6 +100,7 @@ private fun DependencyFileViewTool(project: Project) {
     var statusText by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val toolset = remember { ExtendedMcpToolset() }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("get_dependency_file_text", fontWeight = FontWeight.Bold)
@@ -99,7 +139,7 @@ private fun DependencyFileViewTool(project: Project) {
                     scope.launch {
                         val result = runCatching {
                             withContext(Dispatchers.Default) {
-                                ExtendedMcpToolset().get_dependency_file_text(
+                                toolset.get_dependency_file_text(
                                     url,
                                     lineNumber,
                                     linesBefore,
@@ -112,7 +152,7 @@ private fun DependencyFileViewTool(project: Project) {
                             statusText = "Done"
                         }.onFailure { error ->
                             outputState.setTextAndPlaceCursorAtEnd(error.message ?: "Error")
-                            thisLogger().error(error)
+                            logger.error(error)
                             statusText = "Failed"
                         }
                         isRunning = false
@@ -139,7 +179,6 @@ private fun DependencyFileViewTool(project: Project) {
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun DependencyRegexSearchTool(project: Project) {
     val regexState = rememberTextFieldState()
     val fileMaskState = rememberTextFieldState()
