@@ -43,3 +43,4 @@ bin/
 .DS_Store
 /.intellijPlatform/
 /.idea/
+.junie/guidelines.md
