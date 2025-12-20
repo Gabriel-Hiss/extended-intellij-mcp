@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.coroutineToIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.intellij.psi.search.ProjectScope
 import com.intellij.usageView.UsageInfo
@@ -113,15 +114,53 @@ class ExtendedMcpToolset : McpToolset {
             val textBeforeOccurrence = document.getText(TextRange(startLineStartOffset, textRange.startOffset)).take(MAX_USAGE_TEXT_CHARS)
             val textInner = document.getText(TextRange(textRange.startOffset, textRange.endOffset)).take(MAX_USAGE_TEXT_CHARS)
             val textAfterOccurrence = document.getText(TextRange(textRange.endOffset, endLineEndOffset)).take(MAX_USAGE_TEXT_CHARS)
-            UsageInfoEntry(file.path, startLineNumber + 1, "$textBeforeOccurrence||$textInner||$textAfterOccurrence")
+            UsageInfoEntry(file.url, startLineNumber + 1, "$textBeforeOccurrence||$textInner||$textAfterOccurrence")
         }
 
         return UsageInfoResult(entries = entries, probablyHasMoreMatchingEntries = usages.size >= maxUsageCount, timedOut = timedOut)
     }
 
+    @McpTool
+    @McpDescription(
+        """
+        |Returns the text content of a dependency file (library).
+        |Use the URL returned by `search_in_dependencies_by_regex`.
+    """
+    )
+    suspend fun get_dependency_file_text(
+        @McpDescription("URL to the file (as returned by search_in_dependencies_by_regex)")
+        url: String,
+        @McpDescription("Line number to center the view on (1-based)")
+        lineNumber: Int,
+        @McpDescription("Number of lines to show before the target line")
+        linesBefore: Int = Constants.DEFAULT_LINES_AROUND,
+        @McpDescription("Number of lines to show after the target line")
+        linesAfter: Int = Constants.DEFAULT_LINES_AROUND,
+    ): String {
+        val file = VirtualFileManager.getInstance().findFileByUrl(url)
+            ?: mcpFail("File $url not found")
+
+        return readAction {
+            val document = FileDocumentManager.getInstance().getDocument(file)
+                ?: mcpFail("Could not get document for $url")
+
+            val totalLines = document.lineCount
+            if (totalLines == 0) return@readAction ""
+
+            val zeroBasedLine = (lineNumber - 1).coerceIn(0, totalLines - 1)
+            val startLine = (zeroBasedLine - linesBefore).coerceIn(0, totalLines - 1)
+            val endLine = (zeroBasedLine + linesAfter).coerceIn(0, totalLines - 1)
+
+            val startOffset = document.getLineStartOffset(startLine)
+            val endOffset = document.getLineEndOffset(endLine)
+
+            document.getText(TextRange(startOffset, endOffset))
+        }
+    }
+
     @Serializable
     data class UsageInfoEntry(
-        val filePath: String,
+        val fileUrl: String,
         val lineNumber: Int,
         val lineText: String,
     )

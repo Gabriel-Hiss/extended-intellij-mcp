@@ -1,38 +1,23 @@
 package io.github.sushkovpv.extendedmcp.extendedmcpintellij
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.intellij.openapi.diagnostic.thisLogger
-import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import org.jetbrains.jewel.bridge.addComposeTab
-import org.jetbrains.jewel.ui.component.CheckboxRow
-import org.jetbrains.jewel.ui.component.OutlinedButton
-import org.jetbrains.jewel.ui.component.Text
-import org.jetbrains.jewel.ui.component.TextArea
-import org.jetbrains.jewel.ui.component.TextField
-import kotlinx.coroutines.launch
+import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.jewel.bridge.addComposeTab
+import org.jetbrains.jewel.ui.component.*
 
 class MyToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = true
@@ -51,8 +36,97 @@ class MyToolWindowFactory : ToolWindowFactory {
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun MyToolWindowContent(project: Project) {
-    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         DependencyRegexSearchTool(project)
+        DependencyFileViewTool(project)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun DependencyFileViewTool(project: Project) {
+    val urlState = rememberTextFieldState()
+    val lineNumberState = rememberTextFieldState("1")
+    val linesBeforeState = rememberTextFieldState("300")
+    val linesAfterState = rememberTextFieldState("300")
+    val outputState = rememberTextFieldState()
+    var statusText by remember { mutableStateOf("") }
+    var isRunning by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("get_dependency_file_text", fontWeight = FontWeight.Bold)
+        TextField(
+            state = urlState,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("File URL (from search results)") },
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextField(
+                state = lineNumberState,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Line number") },
+            )
+            TextField(
+                state = linesBeforeState,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Lines before") },
+            )
+            TextField(
+                state = linesAfterState,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Lines after") },
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                enabled = !isRunning,
+                onClick = {
+                    val url = urlState.text.toString()
+                    val lineNumber = lineNumberState.text.toString().toIntOrNull() ?: 1
+                    val linesBefore = linesBeforeState.text.toString().toIntOrNull() ?: 300
+                    val linesAfter = linesAfterState.text.toString().toIntOrNull() ?: 300
+                    isRunning = true
+                    statusText = "Running..."
+                    scope.launch {
+                        val result = runCatching {
+                            withContext(Dispatchers.Default) {
+                                ExtendedMcpToolset().get_dependency_file_text(
+                                    url,
+                                    lineNumber,
+                                    linesBefore,
+                                    linesAfter
+                                )
+                            }
+                        }
+                        result.onSuccess { value ->
+                            outputState.setTextAndPlaceCursorAtEnd(value)
+                            statusText = "Done"
+                        }.onFailure { error ->
+                            outputState.setTextAndPlaceCursorAtEnd(error.message ?: "Error")
+                            thisLogger().error(error)
+                            statusText = "Failed"
+                        }
+                        isRunning = false
+                    }
+                },
+            ) { Text("Get file text") }
+            OutlinedButton(
+                enabled = !isRunning,
+                onClick = {
+                    outputState.setTextAndPlaceCursorAtEnd("")
+                    statusText = ""
+                },
+            ) { Text("Clear") }
+        }
+        if (statusText.isNotBlank()) {
+            Text(statusText)
+        }
+        TextArea(
+            state = outputState,
+            modifier = Modifier.fillMaxWidth().height(240.dp),
+            readOnly = true,
+        )
     }
 }
 
@@ -123,7 +197,7 @@ private fun DependencyRegexSearchTool(project: Project) {
                                 append(value.timedOut)
                             }
                             val body = value.entries.joinToString("\n") { entry ->
-                                "${entry.filePath}:${entry.lineNumber} ${entry.lineText}"
+                                "${entry.fileUrl}:${entry.lineNumber} ${entry.lineText}"
                             }
                             outputState.setTextAndPlaceCursorAtEnd(
                                 if (body.isBlank()) header else "$header\n\n$body"
