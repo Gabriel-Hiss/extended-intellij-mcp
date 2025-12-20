@@ -2,7 +2,9 @@ package io.github.sushkovpv.extendedmcp.extendedmcpintellij
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -36,7 +38,12 @@ class MyToolWindowFactory : ToolWindowFactory {
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun MyToolWindowContent(project: Project) {
-    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(
+        Modifier
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         DependencyRegexSearchTool(project)
         DependencyFileViewTool(project)
     }
