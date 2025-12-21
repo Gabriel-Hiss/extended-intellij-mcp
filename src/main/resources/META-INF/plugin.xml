@@ -22,7 +22,8 @@
             <li><b>Project synchronization:</b> Tool to trigger project sync.</li>
         </ul>
         <br>
-        <b>Boost AI Performance:</b> Integrate this MCP server with AI agents like <b>Codex</b> or <b>Claude Code</b> to provide them with deep project context, significantly improving the quality and accuracy of code generation.
+        Boost AI Performance: Integrate this MCP server with AI agents like Codex or Claude Code to provide them with deep project context, significantly improving the quality and accuracy of code generation.
+        <br>
         <br>
         For more information on how to set up the MCP server, see the <a href="https://www.jetbrains.com/help/idea/mcp-server.html#external-client-setup">official documentation</a>.
     ]]></description>
