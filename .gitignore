@@ -44,3 +44,4 @@ bin/
 /.intellijPlatform/
 /.idea/
 .junie/guidelines.md
+/.output.txt
