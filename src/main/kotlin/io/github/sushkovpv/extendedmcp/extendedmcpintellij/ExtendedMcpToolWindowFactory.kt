@@ -65,7 +65,9 @@ private fun SyncProjectTool(project: Project) {
                     statusText = "Syncing..."
                     scope.launch {
                         val result = runCatching {
-                            toolset.syncProject(project)
+                            withContext(Dispatchers.Default) {
+                                toolset.syncProject(project)
+                            }
                         }
                         result.onSuccess {
                             statusText = "Done"

@@ -11,6 +11,9 @@ import com.intellij.mcpserver.mcpFail
 import com.intellij.mcpserver.project
 import com.intellij.openapi.externalSystem.ExternalSystemManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.model.DataNode
+import com.intellij.openapi.externalSystem.model.project.ProjectData
+import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction
@@ -26,14 +29,13 @@ import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
 import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.Constants.MAX_USAGE_TEXT_CHARS
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.*
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -174,10 +176,32 @@ class ExtendedMcpToolset : McpToolset {
     suspend fun syncProject(project: Project) {
         withContext(Dispatchers.EDT) {
             FileDocumentManager.getInstance().saveAllDocuments()
+        }
 
-            ExternalSystemManager.EP_NAME.forEachExtensionSafe { manager ->
-                ExternalSystemUtil.refreshProjects(ImportSpecBuilder(project, manager.systemId))
-            }
+        val managers = ExternalSystemManager.EP_NAME.extensionList
+        if (managers.isEmpty()) return
+
+        coroutineScope {
+            managers.map { manager ->
+                launch {
+                    suspendCancellableCoroutine { continuation ->
+                        val spec = ImportSpecBuilder(project, manager.systemId)
+                            .withCallback(object : ExternalProjectRefreshCallback {
+                                override fun onSuccess(externalProject: DataNode<ProjectData>?) {
+                                    continuation.resume(Unit)
+                                }
+
+                                override fun onFailure(errorMessage: String, errorDetails: String?) {
+                                    val fullMessage = if (errorDetails != null) "$errorMessage: $errorDetails" else errorMessage
+                                    continuation.resumeWithException(RuntimeException(fullMessage))
+                                }
+                            })
+                            .build()
+
+                        ExternalSystemUtil.refreshProjects(spec)
+                    }
+                }
+            }.joinAll()
         }
     }
 
