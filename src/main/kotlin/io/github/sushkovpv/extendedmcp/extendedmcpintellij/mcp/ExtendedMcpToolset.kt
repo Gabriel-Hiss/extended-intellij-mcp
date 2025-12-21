@@ -38,9 +38,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Simple demo toolset that proves plugin can extend MCP server.
- */
 class ExtendedMcpToolset : McpToolset {
     @McpTool
     @McpDescription(
