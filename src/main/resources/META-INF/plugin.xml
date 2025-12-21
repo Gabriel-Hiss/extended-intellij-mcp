@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN, cannot be changed between the plugin versions. -->
-    <id>io.github.sushkovpv.extendedmcp.extended-mcp-intellij</id>
+    <id>io.github.sushkovpv.extended-intellij-mcp</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
@@ -39,8 +39,8 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ExtendedMCP" anchor="right"
-                    factoryClass="io.github.sushkovpv.extendedmcp.extendedmcpintellij.ExtendedMcpToolWindowFactory"
+                    factoryClass="io.github.sushkovpv.extendedintellijmcp.ExtendedMcpToolWindowFactory"
                     icon="AllIcons.Toolwindows.ToolWindowPalette"/>
-        <mcpServer.mcpToolset implementation="io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset"/>
+        <mcpServer.mcpToolset implementation="io.github.sushkovpv.extendedintellijmcp.ExtendedMcpToolset"/>
     </extensions>
 </idea-plugin>

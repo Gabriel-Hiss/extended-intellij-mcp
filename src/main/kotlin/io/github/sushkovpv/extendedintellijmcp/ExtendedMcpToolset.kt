@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName", "unused")
 
-package io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp
+package io.github.sushkovpv.extendedintellijmcp
 
 import com.intellij.find.FindManager
 import com.intellij.find.impl.FindInProjectUtil
@@ -28,7 +28,7 @@ import com.intellij.usageView.UsageInfo
 import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
-import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.Constants.MAX_USAGE_TEXT_CHARS
+import io.github.sushkovpv.extendedintellijmcp.Constants.MAX_USAGE_TEXT_CHARS
 import kotlinx.coroutines.*
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi

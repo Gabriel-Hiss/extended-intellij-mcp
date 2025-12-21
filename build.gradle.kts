@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlinCompose)
 }
 
-group = "io.github.sushkovpv.extendedmcp"
+group = "io.github.sushkovpv.extendedintellijmcp"
 version = "0.0.2"
 
 repositories {

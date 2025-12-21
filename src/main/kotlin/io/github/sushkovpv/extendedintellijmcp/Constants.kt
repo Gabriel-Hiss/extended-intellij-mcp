@@ -1,4 +1,4 @@
-package io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp
+package io.github.sushkovpv.extendedintellijmcp
 
 object Constants {
     const val TIMEOUT_MILLISECONDS_DESCRIPTION: String = "Timeout in milliseconds"

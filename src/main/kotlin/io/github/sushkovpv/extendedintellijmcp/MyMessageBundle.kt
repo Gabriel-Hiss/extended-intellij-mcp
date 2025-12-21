@@ -1,4 +1,6 @@
-package io.github.sushkovpv.extendedmcp.extendedmcpintellij
+@file:Suppress("unused")
+
+package io.github.sushkovpv.extendedintellijmcp
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.Nls

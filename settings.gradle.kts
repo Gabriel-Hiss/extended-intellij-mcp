@@ -1,1 +1,1 @@
-rootProject.name = "extended-mcp-intellij"
+rootProject.name = "extended-intellij-mcp"

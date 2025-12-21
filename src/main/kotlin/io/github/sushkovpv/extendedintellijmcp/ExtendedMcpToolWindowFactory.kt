@@ -1,4 +1,4 @@
-package io.github.sushkovpv.extendedmcp.extendedmcpintellij
+package io.github.sushkovpv.extendedintellijmcp
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +16,6 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import io.github.sushkovpv.extendedmcp.extendedmcpintellij.mcp.ExtendedMcpToolset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
