@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -24,7 +25,7 @@ import org.jetbrains.jewel.ui.component.*
 
 private val logger = logger<ExtendedMcpToolWindowFactory>()
 
-class ExtendedMcpToolWindowFactory : ToolWindowFactory {
+class ExtendedMcpToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun shouldBeAvailable(project: Project) = ApplicationManager.getApplication().isInternal
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
