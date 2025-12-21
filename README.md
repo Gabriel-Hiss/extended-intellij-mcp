@@ -8,6 +8,12 @@ Extended MCP Server is an IntelliJ IDEA plugin that extends the capabilities of 
 - **Dependency File Inspection:** Provides access to the content of files within project dependencies.
 - **Project Synchronization:** A tool to force project synchronization (e.g., Gradle or Maven).
 
+## AI Agent Integration
+
+Enhance your development workflow by connecting this MCP server to AI agents like **Cursor** or **Claude Code**. Providing these agents with deep context from your IDE and its dependencies significantly improves the quality and accuracy of their code suggestions.
+
+For information on how to set up and use the MCP server in IntelliJ IDEA, refer to the [official documentation](https://www.jetbrains.com/help/idea/mcp-server.html#external-client-setup).
+
 ## Available Tools (MCP Tools)
 
 The plugin adds the following tools to the MCP server:

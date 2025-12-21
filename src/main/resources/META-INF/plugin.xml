@@ -21,6 +21,10 @@
             <li><b>Dependency file inspection:</b> Read content of files within project dependencies.</li>
             <li><b>Project synchronization:</b> Tool to trigger project sync.</li>
         </ul>
+        <br>
+        <b>Boost AI Performance:</b> Integrate this MCP server with AI agents like <b>Codex</b> or <b>Claude Code</b> to provide them with deep project context, significantly improving the quality and accuracy of code generation.
+        <br>
+        For more information on how to set up the MCP server, see the <a href="https://www.jetbrains.com/help/idea/mcp-server.html#external-client-setup">official documentation</a>.
     ]]></description>
 
     <!-- Product and plugin compatibility requirements.
