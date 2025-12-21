@@ -13,17 +13,19 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Extended MCP Server extends the built-in IntelliJ IDEA MCP server by adding additional tools within the IDE.
+        Extended MCP Server extends the built-in JetBrains IDE MCP server by adding additional tools within the IDE.
         <br>
         Features:
         <ul>
             <li><b>Search in dependencies:</b> Search for text patterns in external libraries and dependencies using regex.</li>
-            <li><b>Dependency file inspection:</b> Read content of files within project dependencies.</li>
-            <li><b>Project synchronization:</b> Tool to trigger project sync.</li>
+            <li><b>Read dependency file:</b> Read content of files within project dependencies.</li>
+            <li><b>Sync Project:</b> Tool to update project dependencies.</li>
         </ul>
         <br>
         Boost AI Performance: Integrate this MCP server with AI agents like Codex or Claude Code to provide them with deep project context, significantly improving the quality and accuracy of code generation.
         <br>
+        <br>
+        For a detailed description of all available tools and their parameters, see the <a href="https://github.com/sushkov-pv/extended-intellij-mcp?tab=readme-ov-file#available-tools-mcp-tools">Available Tools</a> section.
         <br>
         For more information on how to set up the MCP server, see the <a href="https://www.jetbrains.com/help/idea/mcp-server.html#external-client-setup">official documentation</a>.
     ]]></description>
