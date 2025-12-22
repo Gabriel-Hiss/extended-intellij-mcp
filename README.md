@@ -3,7 +3,7 @@
 Extended MCP Server is a plugin for JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.) that extends the capabilities of the built-in MCP (Model Context
 Protocol) server by adding useful tools for working with the project and its dependencies.
 
-[![JetBrains Marketplace](https://img.shields.io/badge/Marketplace-Extended%20MCP%20Server-blue)](https://plugins.jetbrains.com/plugin/29460-extended-mcp-server/)
+[![JetBrains Marketplace](https://img.shields.io/badge/JetBrains%20Marketplace-Extended%20MCP%20Server-blue)](https://plugins.jetbrains.com/plugin/29460-extended-mcp-server/)
 
 ## Key Features
 
