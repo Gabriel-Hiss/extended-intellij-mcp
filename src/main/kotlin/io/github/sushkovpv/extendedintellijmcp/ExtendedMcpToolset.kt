@@ -213,7 +213,7 @@ class ExtendedMcpToolset : McpToolset {
     data class UsageInfoResult(
         val entries: List<UsageInfoEntry>,
         @EncodeDefault(mode = EncodeDefault.Mode.NEVER)
-        val probablyHasMoreMatchingEntries: Boolean = false,
+        val probablyHasMoreMatchingEntries: Boolean? = false,
         @EncodeDefault(mode = EncodeDefault.Mode.NEVER)
         val timedOut: Boolean? = false,
     )
