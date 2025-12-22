@@ -42,8 +42,7 @@ class ExtendedMcpToolset : McpToolset {
     @McpTool
     @McpDescription(
         """
-        |Searches with a regex pattern within project dependencies (libraries) using IntelliJ's search engine.
-        |Prefer this tool over reading files with command-line tools because it's much faster.
+        |Searches with a regex pattern within the files of project dependencies (libraries) using IntelliJ's search engine.
         |
         |The result occurrences are surrounded with || characters, e.g. `some text ||substring|| text`
     """
