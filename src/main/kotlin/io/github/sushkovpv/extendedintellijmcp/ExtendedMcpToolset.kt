@@ -138,9 +138,9 @@ class ExtendedMcpToolset : McpToolset {
         @McpDescription("Line number to center the view on (1-based)")
         lineNumber: Int,
         @McpDescription("Number of lines to show before the target line")
-        linesBefore: Int = Constants.DEFAULT_LINES_AROUND,
+        linesBefore: Int = Constants.DEFAULT_LINES_BEFORE,
         @McpDescription("Number of lines to show after the target line")
-        linesAfter: Int = Constants.DEFAULT_LINES_AROUND,
+        linesAfter: Int = Constants.DEFAULT_LINES_AFTER,
     ): String {
         val file = VirtualFileManager.getInstance().findFileByUrl(url)
             ?: mcpFail("File $url not found")

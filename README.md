@@ -43,8 +43,8 @@ Returns the text content of a dependency file (library). Use the URL returned by
 - **Parameters:**
     - `url`: URL to the file (as returned by `search_in_dependencies_by_regex`).
     - `lineNumber`: Line number to center the view on (1-based).
-    - `linesBefore` (optional): Number of lines to show before the target line (default: `300`).
-    - `linesAfter` (optional): Number of lines to show after the target line (default: `300`).
+    - `linesBefore` (optional): Number of lines to show before the target line (default: `30`).
+    - `linesAfter` (optional): Number of lines to show after the target line (default: `70`).
 
 ### `sync_project`
 

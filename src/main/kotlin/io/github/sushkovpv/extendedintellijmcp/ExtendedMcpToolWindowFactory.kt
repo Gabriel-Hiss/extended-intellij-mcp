@@ -96,8 +96,8 @@ private fun SyncProjectTool(project: Project) {
 private fun DependencyFileViewTool() {
     val urlState = rememberTextFieldState()
     val lineNumberState = rememberTextFieldState("1")
-    val linesBeforeState = rememberTextFieldState("300")
-    val linesAfterState = rememberTextFieldState("300")
+    val linesBeforeState = rememberTextFieldState(Constants.DEFAULT_LINES_BEFORE.toString())
+    val linesAfterState = rememberTextFieldState(Constants.DEFAULT_LINES_AFTER.toString())
     val outputState = rememberTextFieldState()
     var statusText by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
@@ -134,8 +134,8 @@ private fun DependencyFileViewTool() {
                 onClick = {
                     val url = urlState.text.toString()
                     val lineNumber = lineNumberState.text.toString().toIntOrNull() ?: 1
-                    val linesBefore = linesBeforeState.text.toString().toIntOrNull() ?: 300
-                    val linesAfter = linesAfterState.text.toString().toIntOrNull() ?: 300
+                    val linesBefore = linesBeforeState.text.toString().toIntOrNull() ?: Constants.DEFAULT_LINES_BEFORE
+                    val linesAfter = linesAfterState.text.toString().toIntOrNull() ?: Constants.DEFAULT_LINES_AFTER
                     isRunning = true
                     statusText = "Running..."
                     scope.launch {
