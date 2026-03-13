@@ -14,7 +14,11 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.externalSystem.ExternalSystemManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.model.DataNode
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListener
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
 import com.intellij.openapi.externalSystem.model.project.ProjectData
+import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -34,8 +38,8 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration.Companion.milliseconds
 
 class ExtendedMcpToolset : McpToolset {
@@ -164,42 +168,89 @@ class ExtendedMcpToolset : McpToolset {
 
     @McpTool
     @McpDescription("Synchronizes all external systems (Gradle, Maven, NPM, etc.) for the project to apply changes in dependencies.")
-    suspend fun sync_project() {
+    suspend fun sync_project(): String {
         val project = currentCoroutineContext().project
-        syncProject(project)
+        return syncProject(project)
     }
 
-    suspend fun syncProject(project: Project) {
+    suspend fun syncProject(project: Project): String {
         withContext(Dispatchers.EDT) {
             FileDocumentManager.getInstance().saveAllDocuments()
         }
 
         val managers = ExternalSystemManager.EP_NAME.extensionList
-        if (managers.isEmpty()) return
+        if (managers.isEmpty()) {
+            return ""
+        }
 
-        coroutineScope {
-            managers.map { manager ->
-                launch {
-                    suspendCancellableCoroutine { continuation ->
-                        val spec = ImportSpecBuilder(project, manager.systemId)
-                            .withCallback(object : ExternalProjectRefreshCallback {
-                                override fun onSuccess(externalProject: DataNode<ProjectData>?) {
-                                    continuation.resume(Unit)
-                                }
+        val projectId = ExternalSystemTaskId.getProjectId(project)
+        val systemIds = managers.map { it.systemId }.toSet()
+        val shouldPrefixOutput = systemIds.size > 1
+        val logEntries = ConcurrentLinkedQueue<String>()
+        val progressManager = ExternalSystemProgressNotificationManager.getInstance()
+        val listener = object : ExternalSystemTaskNotificationListener {
+            override fun onTaskOutput(id: ExternalSystemTaskId, text: String, stdOut: Boolean) {
+                if (!id.belongsToCurrentSync(projectId, systemIds)) return
+                if (text.isEmpty()) return
 
-                                override fun onFailure(errorMessage: String, errorDetails: String?) {
-                                    val fullMessage = if (errorDetails != null) "$errorMessage: $errorDetails" else errorMessage
-                                    continuation.resumeWithException(RuntimeException(fullMessage))
-                                }
-                            })
-                            .build()
+                logEntries.add(text.withOptionalPrefix(id, shouldPrefixOutput))
+            }
+        }
 
-                        ExternalSystemUtil.refreshProjects(spec)
+        progressManager.addNotificationListener(listener)
+        try {
+            supervisorScope {
+                managers.map { manager ->
+                    async {
+                        runCatching {
+                            suspendCancellableCoroutine { continuation ->
+                                val spec = ImportSpecBuilder(project, manager.systemId)
+                                    .withCallback(object : ExternalProjectRefreshCallback {
+                                        override fun onSuccess(externalProject: DataNode<ProjectData>?) {
+                                            continuation.resume(Unit)
+                                        }
+
+                                        override fun onFailure(errorMessage: String, errorDetails: String?) {
+                                            val fullMessage = listOfNotNull(errorMessage, errorDetails)
+                                                .joinToString(": ")
+                                                .ifBlank { "Unknown sync error" }
+                                            continuation.resumeWith(Result.failure(RuntimeException(fullMessage)))
+                                        }
+                                    })
+                                    .build()
+
+                                ExternalSystemUtil.refreshProjects(spec)
+                            }
+                        }
                     }
-                }
-            }.joinAll()
+                }.awaitAll()
+            }
+
+            return logEntries.joinToString(separator = "").normalizeLineEndings()
+        } finally {
+            progressManager.removeNotificationListener(listener)
         }
     }
+
+    private fun ExternalSystemTaskId.belongsToCurrentSync(
+        projectId: String,
+        systemIds: Set<com.intellij.openapi.externalSystem.model.ProjectSystemId>,
+    ): Boolean {
+        return type == ExternalSystemTaskType.RESOLVE_PROJECT &&
+            ideProjectId == projectId &&
+            projectSystemId in systemIds
+    }
+
+    private fun String.withOptionalPrefix(id: ExternalSystemTaskId, shouldPrefixOutput: Boolean): String {
+        if (!shouldPrefixOutput) return this
+        val prefix = "[${id.projectSystemId.readableName}] "
+        return lineSequence()
+            .joinToString(separator = "\n", postfix = if (endsWith('\n')) "\n" else "") { line ->
+                if (line.isEmpty()) line else "$prefix$line"
+            }
+    }
+
+    private fun String.normalizeLineEndings(): String = replace("\r\n", "\n").replace('\r', '\n')
 
     @Serializable
     data class UsageInfoEntry(

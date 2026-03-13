@@ -50,3 +50,6 @@ Returns the text content of a dependency file (library). Use the URL returned by
 ### `sync_project`
 
 Synchronizes all external systems (Gradle, Maven, NPM, etc.) for the project to apply changes in dependencies.
+
+- **Returns:**
+    - Raw output captured from the external system sync as a single string.

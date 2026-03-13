@@ -50,6 +50,7 @@ private fun ExtendedMcpToolWindowContent(project: Project) {
 
 @Composable
 private fun SyncProjectTool(project: Project) {
+    val outputState = rememberTextFieldState()
     var statusText by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -69,9 +70,11 @@ private fun SyncProjectTool(project: Project) {
                                 toolset.syncProject(project)
                             }
                         }
-                        result.onSuccess {
+                        result.onSuccess { value ->
+                            outputState.setTextAndPlaceCursorAtEnd(value)
                             statusText = "Done"
                         }.onFailure { error ->
+                            outputState.setTextAndPlaceCursorAtEnd(error.message ?: "Error")
                             statusText = "Failed: ${error.message}"
                             logger.error(error)
                         }
@@ -82,6 +85,7 @@ private fun SyncProjectTool(project: Project) {
             OutlinedButton(
                 enabled = !isRunning,
                 onClick = {
+                    outputState.setTextAndPlaceCursorAtEnd("")
                     statusText = ""
                 },
             ) { Text("Clear") }
@@ -89,6 +93,11 @@ private fun SyncProjectTool(project: Project) {
         if (statusText.isNotBlank()) {
             Text(statusText)
         }
+        TextArea(
+            state = outputState,
+            modifier = Modifier.fillMaxWidth().height(240.dp),
+            readOnly = true,
+        )
     }
 }
 
