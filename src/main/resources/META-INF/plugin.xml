@@ -35,6 +35,7 @@
     <depends>com.intellij.modules.compose</depends>
     <!-- Consume MCP Server plugin to extend its toolsets -->
     <depends>com.intellij.mcpServer</depends>
+    <depends optional="true" config-file="extended-mcp-clion.xml">com.intellij.clion</depends>
 
     <resource-bundle>messages.MyMessageBundle</resource-bundle>
     <!-- Extensions defined by the plugin.

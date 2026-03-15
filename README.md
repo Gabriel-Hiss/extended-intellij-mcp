@@ -49,7 +49,8 @@ Returns the text content of a dependency file (library). Use the URL returned by
 
 ### `sync_project`
 
-Synchronizes all external systems (Gradle, Maven, NPM, etc.) for the project to apply changes in dependencies.
+Synchronizes all external systems (Gradle, Maven, NPM, etc.) and reloads CMake projects in CLion to apply dependency and project model changes.
 
 - **Returns:**
-    - Raw output captured from the external system sync as a single string.
+    - Raw output captured from the external system sync as a single string when it fits within the MCP response size.
+    - If the output is too large, the plugin saves the full log to a `.log` file in the project root and returns the absolute file path instead.
